@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>LET'S TAKE THE ATTENDANCE</title>
+
+<style>
+
+    body {
+
+        font-family: Arial, sans-serif;
+
+        background: #f5f5f5;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        margin-top: 40px;
+
+    }
+
+    h1 {
+
+        color: #333;
+
+    }
+
+    #gameContainer {
+
+        margin-top: 20px;
+
+        padding: 20px;
+
+        background: white;
+
+        border-radius: 10px;
+
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+        width: 330px;
+
+        text-align: center;
+
+        display: none;
+
+    }
+
+    #randomNumber {
+
+        font-size: 40px;
+
+        font-weight: bold;
+
+        margin-bottom: 20px;
+
+    }
+
+    #timeDisplay {
+
+        font-size: 22px;
+
+        margin-bottom: 15px;
+
+    }
+
+    input {
+
+        padding: 10px;
+
+        width: 160px;
+
+        font-size: 16px;
+
+        margin-bottom: 15px;
+
+    }
+
+    button {
+
+        padding: 10px 18px;
+
+        font-size: 16px;
+
+        cursor: pointer;
+
+        border: none;
+
+        background: #28d609;
+
+        color: rgb(0, 0, 0);
+
+        border-radius: 5px;
+
+    }
+
+    #summary {
+
+        margin-top: 20px;
+
+        width: 350px;
+
+        line-height: 1.5;
+
+    }
+
+    .notifyBox {
+    padding: 12px 18px;
+    min-width: 220px;
+    color: white;
+    font-size: 16px;
+    border-radius: 6px;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: notifyIn 0.25s forwards, notifyOut 0.4s forwards 2.8s;
+}
+
+@keyframes notifyIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes notifyOut {
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>LET'S TAKE THE ATTENDANCE</h1>
+
+
+
+<div id="summary">
+
+    <strong>Game Rules:</strong><br>
+
+    • You start with <b>10 seconds</b> at the beginning.<br>
+
+    • A random number will appear, type it correctly.<br>
+
+    • Correct answers give you points equal to the number of digits, as well as the same amount of seconds.<br>
+
+    • Wrong answers take points from you equal to the number of digits.<br>
+
+    • Each digit length is asked <b>5 times</b>, then the digit count increases.<br>
+
+    • The game continues forever. Good luck!
+
+    <div id="bestScoreDisplay" style="margin-top:10px; font-size:20px;">
+    Highest Score: 0
+</div>
+
+
+</div>
+
+<button id="startBtn">Start Game</button>
+
+<div id="gameContainer">
+
+    <div id="timeDisplay">Time: 10</div>
+
+    <div id="pointDisplay">Point: 0</div>
+
+    <div id="randomNumber"></div>
+
+    <input id="userInput" placeholder="Type number...">
+
+    <br>
+
+    <button id="submitBtn">Submit</button>
+
+</div>
+
+<div id="notifyContainer" style="
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+"></div>
+
+<!-- Leaderboard / submit score UI -->
+<div id="leaderboardContainer" style="margin-top:20px; width:340px; text-align:center;">
+    <div style="margin-bottom:8px;">Player ID (exactly 9 digits):</div>
+    <input id="playerName" placeholder="123456789" maxlength="9" pattern="\d{9}" inputmode="numeric" style="width:200px; margin-bottom:8px;">
+    <div>
+        <button id="submitScoreBtn">Submit Score</button>
+        <button id="refreshBoardBtn" style="background:#333; color:#fff; margin-left:8px;">Refresh Leaderboard</button>
+    </div>
+    <h3 style="margin:12px 0 6px 0;">Leaderboard (Top 5)</h3>
+    <div id="leaderboard" style="background:#fff; border-radius:8px; padding:10px; box-shadow:0 0 6px rgba(0,0,0,0.08); min-height:60px;"></div>
+</div>
+
+</body>
+<script type="module" src="game.js"></script>
+</html>
+

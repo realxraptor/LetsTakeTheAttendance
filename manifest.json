@@ -1,0 +1,22 @@
+{
+  "name": "Let'sTakeTheAttendance!",
+  "short_name": "ATTENDANCE!",
+  "start_url": "./",
+  "display": "standalone",
+    "description": "Teacher could you take my ATTENDANCE!!!",
+
+  "background_color": "#ffffff",
+  "theme_color": "#fff890",
+  "icons": [
+    {
+      "src": "./images/icon1.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    },
+      {
+    "src": "./images/icon1.png",
+    "sizes": "1024x1024",
+    "type": "image/png"
+  }
+  ]
+}
