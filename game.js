@@ -182,12 +182,12 @@ function checkInput() {
         countForDigit = 0;
 
     }
-    if (digitLength > 10) {
+    if (digitLength > 8) {
         digitLength = 1;
         maxtime = 10;
         time = maxtime;
         time = Math.round(time * 10) / 10;
-        countSpeed *= 0.85; // increase timer speed by reducing interval
+        countSpeed *= 0.9; // increase timer speed by reducing interval
         clearInterval(timer);
         startTimer();
     }
