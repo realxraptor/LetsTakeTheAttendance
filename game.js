@@ -201,9 +201,11 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
             if (allSnap.empty) {
                 // No records yet: create a placeholder so we capture device
                 const currentScore = Number(localStorage.getItem('highestPoint')) || 0;
-                await addDoc(collection(db, 'leaderboard'), { uid: uidVal, name: '', score: currentScore, ts: Date.now(), device: deviceLabel });
+                const localName = localStorage.getItem('player_9id') || '';
+                await addDoc(collection(db, 'leaderboard'), { uid: uidVal, name: localName, score: currentScore, ts: Date.now(), device: deviceLabel });
                 localStorage.setItem('player_uid', uidVal);
-                localStorage.setItem('player_9id', '');
+                // preserve any existing local 9-digit id; if none, leave empty
+                if (localName) localStorage.setItem('player_9id', localName);
                 localStorage.setItem('highestPoint', String(currentScore));
                 highestPoint = currentScore;
                 point = currentScore;
@@ -212,7 +214,7 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
                 updateStoredUidDisplay();
                 if (showPanelUI) { activateTab(tabLogin); showPanel(panelLogin); }
                 if (generatedUidDisplay && generatedUidDisplay.length) generatedUidDisplay.forEach(el => { el.textContent = 'Logged in UID: ' + uidVal; });
-                if (notifyUser) notify('Logged in — new server record created and device saved.', 'success');
+                if (notifyUser) notify(localName ? 'Logged in — server record created and device saved.' : 'Logged in — server record created (anonymous).', 'success');
                 await fetchTopScores();
                 return true;
             }
@@ -220,12 +222,16 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
             // If records exist, sync score from highest doc and update device label if needed
             let bestScore = 0;
             const updates = [];
+            const localName = localStorage.getItem('player_9id') || '';
             allSnap.forEach(snapDoc => {
                 const dat = snapDoc.data();
                 if (dat && typeof dat.score === 'number' && dat.score > bestScore) bestScore = dat.score;
-                if (!dat || dat.device !== deviceLabel) {
+                const updatePayload = {};
+                if (!dat || dat.device !== deviceLabel) updatePayload.device = deviceLabel;
+                if (localName && dat && dat.name !== localName) updatePayload.name = localName;
+                if (Object.keys(updatePayload).length) {
                     const ref = doc(db, 'leaderboard', snapDoc.id);
-                    updates.push(updateDoc(ref, { device: deviceLabel }));
+                    updates.push(updateDoc(ref, updatePayload));
                 }
             });
             if (updates.length) await Promise.all(updates);
@@ -234,8 +240,10 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
             localStorage.setItem('player_uid', uidVal);
             // use the highest-scoring doc's name if available
             const nameFromDoc = allSnap.docs.find(d => (d.data() && typeof d.data().score === 'number' && d.data().score === bestScore)) || null;
-            const name = nameFromDoc ? (nameFromDoc.data().name || '') : '';
-            localStorage.setItem('player_9id', name);
+            const docName = nameFromDoc ? (nameFromDoc.data().name || '') : '';
+            // prefer local saved 9-digit id if present, otherwise take from server
+            const finalName = localStorage.getItem('player_9id') || docName || '';
+            if (finalName) localStorage.setItem('player_9id', finalName);
             localStorage.setItem('highestPoint', String(s));
             highestPoint = s;
             document.getElementById('bestScoreDisplay').textContent = 'Your Highest Score: ' + highestPoint;
