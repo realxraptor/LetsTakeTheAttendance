@@ -166,11 +166,11 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
                 ts: Date.now(),
                 device: detectDeviceLabel()
             });
+            highestPoint = 0;
+            localStorage.setItem('highestPoint', highestPoint);
+
             localStorage.setItem('player_uid', uid);
             localStorage.setItem('player_9id', id9);
-            localStorage.setItem('highestPoint', '0');
-            highestPoint = 0;
-            point = 0;
             document.getElementById('bestScoreDisplay').textContent = 'Your Highest Score: ' + highestPoint;
             updatePoint();
             updateStoredUidDisplay();
@@ -199,24 +199,9 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
             const deviceLabel = detectDeviceLabel();
 
             if (allSnap.empty) {
-                // No records yet: create a placeholder so we capture device
-                const currentScore = Number(localStorage.getItem('highestPoint')) || 0;
-                const localName = localStorage.getItem('player_9id') || '';
-                await addDoc(collection(db, 'leaderboard'), { uid: uidVal, name: localName, score: currentScore, ts: Date.now(), device: deviceLabel });
-                localStorage.setItem('player_uid', uidVal);
-                // preserve any existing local 9-digit id; if none, leave empty
-                if (localName) localStorage.setItem('player_9id', localName);
-                localStorage.setItem('highestPoint', String(currentScore));
-                highestPoint = currentScore;
-                point = currentScore;
-                document.getElementById('bestScoreDisplay').textContent = 'Your Highest Score: ' + highestPoint;
-                updatePoint();
-                updateStoredUidDisplay();
-                if (showPanelUI) { activateTab(tabLogin); showPanel(panelLogin); }
-                if (generatedUidDisplay && generatedUidDisplay.length) generatedUidDisplay.forEach(el => { el.textContent = 'Logged in UID: ' + uidVal; });
-                if (notifyUser) notify(localName ? 'Logged in — server record created and device saved.' : 'Logged in — server record created (anonymous).', 'success');
-                await fetchTopScores();
-                return true;
+                // Do NOT auto-create server records on login — account creation must happen via Sign Up only.
+                if (notifyUser) notify('UID not found. Please sign up first.', 'warn');
+                return false;
             }
 
             // If records exist, sync score from highest doc and update device label if needed
@@ -226,13 +211,6 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
             allSnap.forEach(snapDoc => {
                 const dat = snapDoc.data();
                 if (dat && typeof dat.score === 'number' && dat.score > bestScore) bestScore = dat.score;
-                const updatePayload = {};
-                if (!dat || dat.device !== deviceLabel) updatePayload.device = deviceLabel;
-                if (localName && dat && dat.name !== localName) updatePayload.name = localName;
-                if (Object.keys(updatePayload).length) {
-                    const ref = doc(db, 'leaderboard', snapDoc.id);
-                    updates.push(updateDoc(ref, updatePayload));
-                }
             });
             if (updates.length) await Promise.all(updates);
 
@@ -268,12 +246,16 @@ const leaderboardContainer = document.getElementById("leaderboardContainer");
 
     // Auto-login if a uid is stored locally
     const autoUid = localStorage.getItem('player_uid');
+   
     if (autoUid) {
+
         // don't show UI elements when auto-logging unless necessary; no notification by default
         performLogin(autoUid, { notifyUser: false, showPanelUI: false }).then(success => {
             if (success) fetchTopScores().catch(() => {});
         });
     }
+
+
 
 document.getElementById("startBtn").onclick = startGame;
 document.getElementById("quitBtn").onclick = resetGame;
@@ -299,6 +281,9 @@ function resetGame() {
     clearInterval(timer);
     notify("Game Over! Your final score: " + point, "error");
 
+   
+      applySumbitScore();
+    
     // değerleri sıfırla
     maxtime = 10;
     time = maxtime;
@@ -445,6 +430,13 @@ function generatePlayerID() {
 
 
 async function submitScore(name, score) {
+
+    // ensure a persistent player uid so we can check / remove prior submits
+    let uid = localStorage.getItem('player_uid');
+    if (!uid) {
+        notify('Sign in to submit your score.', 'warn');
+        return;
+    }
     // validate that name is exactly 9 digits (user-supplied ID)
     if (!name) name = '';
     const idStr = String(name).trim();
@@ -453,13 +445,6 @@ async function submitScore(name, score) {
         return;
     }
     name = idStr; // normalize
-    // ensure a persistent player uid so we can check / remove prior submits
-    let uid = localStorage.getItem('player_uid');
-    if (!uid) {
-        uid = generatePlayerID();
-        notify('Generated new player ID: ' + uid, 'warn');
-        localStorage.setItem('player_uid', uid);
-    }
 
     try {
         const mod = await import('./firebaseinit.js');
@@ -470,10 +455,13 @@ async function submitScore(name, score) {
         const prevSnap = await getDocs(qPrev);
 
         // determine previous highest score for this uid (if any)
-        let prevHighest = null;
+        // start from the locally stored highest point (or 0) and use any server docs that are higher
+        let prevHighest = 0;
         prevSnap.forEach(d => {
             const dat = d.data();
-            if (prevHighest === null || (dat && typeof dat.score === 'number' && dat.score > prevHighest)) prevHighest = dat.score;
+            if (dat && typeof dat.score === 'number' && dat.score >= prevHighest) {
+                prevHighest = dat.score;
+            }
         });
 
         // check device differences and update stored device labels if necessary
@@ -492,8 +480,8 @@ async function submitScore(name, score) {
             console.warn('Could not update device labels for previous docs', devErr);
         }
 
-        if (prevHighest !== null && score < prevHighest) {
-            notify('Submit blocked — your new score is not higher than your previous submission (' + prevHighest + ').', 'warn');
+         if (typeof prevHighest === 'number' && score <= prevHighest) {
+            notify('Submit blocked — your new score must be higher than your previous submission (' + prevHighest + ').', 'warn');
             return;
         }
 
@@ -554,7 +542,7 @@ async function fetchTopScores() {
             leaderboardDiv.innerHTML = '<div>No scores yet</div>';
             return;
         }
-        let html = '<ol style="text-align:left; margin:0; padding-left:18px;font-size:16px;">';
+       let html = '<ol style="text-align:left; margin:0; padding-left:28px;font-size:12px;font-family: \'Press Start 2P\', monospace;">';
         snap.forEach(docSnap => {
             const d = docSnap.data();
             // display player ID with uid appended for disambiguation, but don't modify stored data
@@ -571,7 +559,7 @@ async function fetchTopScores() {
                      const deviceText = d.device ? `<span class="device">${escapeHtml(d.device)}</span> ` : '';
                      const scoreText = d.score ? '<span class="score">' + d.score + ' POINTS</span>' : '0 POINTS';
 
-                 html += `<li> ${escapeHtml(baseName)}${uidHtml} — ${deviceText} — ${scoreText}   </li>`;  
+                 html += `<li> ${escapeHtml(baseName)}${uidHtml} ${deviceText} ${scoreText}   </li>`;  
 
         });
         html += '</ol>';
@@ -588,37 +576,86 @@ function escapeHtml(s) {
 }
 
 // wire leaderboard buttons
-if (submitScoreBtn) submitScoreBtn.addEventListener('click', () => {
-    // prefer saved 9-digit ID, otherwise use the input value
+function applySumbitScore() {
+  // prefer saved 9-digit ID, otherwise use the input value
     const saved9 = localStorage.getItem('player_9id');
     const name = saved9 || (playerNameInput ? playerNameInput.value.trim() : '');
     // submit current points for this player
-    submitScore(name, point);
-});
+    submitScore(name, highestPoint);
+}
+
+if (submitScoreBtn) submitScoreBtn.addEventListener('click', applySumbitScore);
 if (refreshBoardBtn) refreshBoardBtn.addEventListener('click', fetchTopScores);
 
 // initial leaderboard load
 try { fetchTopScores(); } catch (e) { /* ignore */ }
 
 
-function notify(message, type = "success") {
+function notify(message, type = "success", duration = 1000) {
     const colors = {
         success: "#28a745",
-        warn: "#ffc107",
+        warn: "#bf8f00ff",
         error: "#dc3545"
     };
 
     const box = document.createElement("div");
     box.className = "notifyBox";
     box.style.background = colors[type] || colors.success;
+
+    // Disable any CSS animations defined in stylesheet; we control animation timings here
+    box.style.animation = 'none';
+
+    // Transition Settings (apply to both opacity and transform)
+    const fadeMs = 300;
+    box.style.transition = `opacity ${fadeMs}ms ease, transform ${fadeMs}ms ease`;
+    box.style.opacity = '0';
+    box.style.transform = 'translateY(20px)';
     box.textContent = message;
 
-    document.getElementById("notifyContainer").appendChild(box);
+    const container = document.getElementById("notifyContainer");
+    if (!container) return;
 
-    // 1.5 saniye sonra DOM'dan sil
-    setTimeout(() => {
-        box.remove();
-    }, 1500);
+    container.appendChild(box);
+
+    // Unified function to handle smooth removal
+    const fadeOutAndRemove = () => {
+        if (box.dataset.isClosing) return;
+        box.dataset.isClosing = "true";
+
+        // Trigger the fade out + move down
+        box.style.opacity = '0';
+        box.style.transform = 'translateY(20px)';
+
+        // Listen for the CSS transition to finish before removing
+        box.addEventListener('transitionend', () => {
+            try { box.remove(); } catch (e) { /* ignore */ }
+        }, { once: true });
+
+        // Safety fallback
+        setTimeout(() => {
+            if (document.body.contains(box)) {
+                try { box.remove(); } catch (e) { /* ignore */ }
+            }
+        }, fadeMs + 150);
+    };
+
+    // Trigger Fade-In and start the visible-duration timer only after fade-in completes
+    // Duration is scaled by message length: 1 char = 50ms (but can be overridden by the duration parameter)
+    const charMs = Math.max(0, String(message || '').length) * 50;
+    const visibleMs = Math.max(200, Number(duration) || 1000, charMs);
+
+    requestAnimationFrame(() => {
+        box.style.opacity = '1';
+        box.style.transform = 'translateY(0)';
+
+        // begin countdown after fade-in finishes so 'visibleMs' represents how long it stays visible
+        setTimeout(() => {
+            fadeOutAndRemove();
+        }, fadeMs + visibleMs);
+    });
+
+    // Allow click-to-dismiss
+    box.addEventListener('click', fadeOutAndRemove);
 }
 
 }

@@ -12,7 +12,7 @@
     <link rel="manifest" href="manifest.json">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 
-<title>LET'S TAKE THE ATTENDANCE</title>
+<title>ATTENDANCERS</title>
 
 <style>
 
@@ -20,7 +20,7 @@
 
         font-family: Arial, sans-serif;
 
-        background:linear-gradient(180deg,#177aeb 0%,#f0f0f0 50%, #ff97ac 100%);
+        background:linear-gradient(180deg,#120500 50%,#ff8623 75%, #fd00e4 100%);
 
         display: flex;
 
@@ -50,7 +50,7 @@
 
         box-shadow: 0 0 10px rgba(0,0,0,0.1);
 
-        background-color: #061e65;
+        background-color: #650606;
 
     width: min(92vw, 360px);
 
@@ -153,7 +153,7 @@ body.retro::after{
     background-image: repeating-linear-gradient(rgba(255,255,255,0.02) 0 1px, transparent 1px 3px);
 }
 
-h1{ font-family:'Press Start 2P', monospace; color:#2d00c1; text-shadow: 0 0 8px rgba(255, 198, 123, 0.12), 2px 2px 0 rgb(54, 94, 255); font-size:18px; }
+h1{ font-family:'Press Start 2P', monospace; color:#ff8623; text-shadow: 0 0 8px rgba(255, 198, 123, 0.12), 2px 2px 0 rgb(255, 54, 54); font-size:36px; }
 
 #gameContainer.retro, #gameContainer { background: linear-gradient(180deg,#061227 0%, #091a2d 100%); border:6px solid #081118; box-shadow: 0 0 0 4px rgba(0,0,0,0.6), 0 8px 20px rgba(0,0,0,0.6); color:#dfffcf; }
 
@@ -161,32 +161,33 @@ h1{ font-family:'Press Start 2P', monospace; color:#2d00c1; text-shadow: 0 0 8px
 
 #timeDisplay, #pointDisplay{ font-family:monospace; font-weight:700; color:#fff; background:#001018; padding:6px 10px; border-radius:6px; display:inline-block; margin:6px 6px; border:2px solid #07303a; }
 
-button{ font-family: 'Press Start 2P', monospace; background:linear-gradient(#9bd5ff,#ffb5b5); border:4px solid #222; box-shadow: 0 6px 0 #111; color:#040404; }
+button{ font-family: 'Press Start 2P', monospace; background:linear-gradient(#0b2,#093); border:4px solid #222; box-shadow: 0 6px 0 #111; color:#040404; }
 button:active{ transform:translateY(3px); box-shadow:0 3px 0 #111 inset; }
 
 input{ background:#000; color:#7fff9e; border:3px solid #043; padding:10px; font-family:monospace; }
 
-#leaderboard{ font-family:monospace; background:linear-gradient(#071118,#051019); color:#e01d64; border:3px solid #082326; }
+#leaderboard{ font-family:monospace; background:linear-gradient(#071118,#051019); color:#e01d54; border:3px solid #082326; }
 
 /* UID visual style in leaderboard */
-#leaderboard li .uid { color: #965478; opacity: 0.9; margin-left:6px; font-size:0.9em; }
+#leaderboard li .uid { color: #965478; opacity: 0.9; margin-left:6px; font-size:0.65em;font-family:'Press Start 2P', monospace; }
 /* Device label in leaderboard */
-#leaderboard li .device { color: #c71d1d; opacity: 0.95; margin-right:6px; font-size:0.9em; }
+#leaderboard li .device { color: #965478; opacity: 0.95; margin-right:6px; font-size:0.65em; font-family:'Press Start 2P', monospace;}
 
 #leaderboard li .score {
     color: #000000;
-    font-weight: 700;
-    background: linear-gradient(90deg,#eb9197 0%,#ffffff 100%);
+    font-weight: 100;
+    font-family: 'Press Start 2P', monospace;
+    background:transparent;
     padding: 4px 8px;
     border-radius: 6px;
     font-size: 12px;
     display: inline-block;
-    margin-left: 6px;
+    margin-left: -12px;
 }
 /*chane "highestscoreleaderboard" title color*/
-#leaderboardContainer h1 { color: #ffb5b5; text-shadow: 0 0 8px rgba(129, 171, 255, 0.2); }
+#leaderboardContainer h1 { color: #f57b3a; text-shadow: 0 0 8px rgba(129, 171, 255, 0.2);font-size: 18px; }
 
-.notifyBox{ font-family:monospace; font-size:12px; border:2px solid #052; background:linear-gradient(#0b2,#093); box-shadow:none; }
+.notifyBox{ font-family:monospace; font-size:12px; border:2px solid #052; background:linear-gradient(#0b2,#093); box-shadow:none; font-family: 'Press Start 2P', monospace; }
 
 /* small pixel-ish corner accents */
 #gameContainer:before{ content:''; position:absolute; left:12px; top:12px; width:10px; height:10px; background:#7bffb2; box-shadow:18px 0 #7bffb2, 0 18px #7bffb2; opacity:0.12; }
@@ -197,9 +198,9 @@ body { transform: none; }
 /* Retro styling for the summary panel */
 #summary {
     font-family: 'Press Start 2P', monospace;
-    background: linear-gradient(180deg,#051721 0%, #071827 100%);
-    color: #27b5d8;
-    border: 5px solid #073a2f;
+    background: linear-gradient(180deg,#210f05 0%, #27071e 100%);
+    color: #d84a27;
+    border: 5px solid #3a0707;
     padding: 14px 16px;
     border-radius: 6px;
     box-shadow: 0 8px 0 rgba(0,0,0,0.6), inset 0 2px 0 rgba(255,255,255,0.02);
@@ -208,7 +209,7 @@ body { transform: none; }
     font-size: 12px;
 }
 
-#summary strong { color: #75a3de; display:block; margin-bottom:6px; font-size:20px; }
+#summary strong { color: #ff3939; display:block; margin-bottom:6px; font-size:20px; }
 
 #summary:before, #summary:after{
     content:''; position:absolute; width:8px; height:8px; background:#7bffb2; opacity:0.08;
@@ -236,7 +237,7 @@ body { transform: none; }
 
 <body>
 
-<h1>LET'S TAKE THE ATTENDANCE</h1>
+<h1>ATTENDANCERS</h1>
 
 <style>
 /* Additional responsive tweaks for small screens */
@@ -303,7 +304,7 @@ body { transform: none; }
     <br>
 
     <button id="submitBtn">Submit</button>
-    <button id="quitBtn" style="background:linear-gradient(180deg,#ff1515 0%, #ff9595 100%); color:#fff; margin-left:8px;">Quit Game</button>
+    <button id="quitBtn" style="background:linear-gradient(180deg,#ab0101 5%, #ff8080 100%); color:#000000; margin-left:8px;">Quit Game</button>
 </div>
 
 <div id="notifyContainer" style="
@@ -361,17 +362,17 @@ body { transform: none; }
 
 <style>
 /* Tab styles (retro) */
-.tabBtn { font-family:'Press Start 2P', monospace; background:linear-gradient(#9bd5ff,#ffb5b5); border:4px solid #222; box-shadow: 0 6px 0 #111; padding:8px 10px; font-size:11px; }
-.tabBtn.active { background: linear-gradient(#ffd47a,#ffb57a); box-shadow: 0 6px 0 #331100; color:#111; }
+.tabBtn { font-family:'Press Start 2P', monospace; background:linear-gradient(#7e4e27 1%,#ff8623 100%); border:4px solid #222; box-shadow: 0 6px 0 #111; padding:8px 10px; font-size:11px; }
+.tabBtn.active { background: linear-gradient(#ff8623,#ffb57a); box-shadow: 0 6px 0 #331100; color:#111; }
 .tabPanel { background: linear-gradient(#071118,#051019); padding:10px; border-radius:6px; border:3px solid #082326; color:#cfe7a8; }
 
 /* Panel action layout */
 .panel-actions { display:flex; flex-direction:column; gap:8px; align-items:center; margin-bottom:6px; }
 .panel-actions .action-row { display:flex; gap:8px; width:100%; justify-content:center; }
 .panel-actions .action-row.save-row { gap:6px; }
-.actionBtn { min-width:150px; padding:10px 12px; font-family:'Press Start 2P', monospace; font-size:11px; border:4px solid #222; box-shadow:0 6px 0 #111; background:linear-gradient(#9bd5ff,#ffb5b5); }
+.actionBtn { min-width:150px; padding:10px 12px; font-family:'Press Start 2P', monospace; font-size:11px; border:4px solid #222; box-shadow:0 6px 0 #111; background:linear-gradient(#982e8a 1%,#e044ff 100%); }
 .actionBtn.secondary { background:#333; color:#fff; box-shadow:0 6px 0 #111; }
-.actionBtn.positive { background:linear-gradient(#7bffb2,#4db87a); color:#042; }
+.actionBtn.positive { background:linear-gradient(#13842c 1%,#35ff23 100%); color:rgb(0, 0, 0); }
 .actionInput { width:160px; padding:8px; border:3px solid #043; background:#000; color:#7fff9e; font-family:monospace; }
 
 
@@ -384,7 +385,7 @@ body { transform: none; }
 }
 </style>
 <div style="margin-top:20px; font-size:12px; color:#666; text-align:center; max-width:340px;">
-Version 2.5 <br>
+Version 2.7 <br>
 
 </body>
 

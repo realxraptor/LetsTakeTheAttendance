@@ -1,5 +1,5 @@
 // serviceWorker.js
-const CACHE_NAME = "V2.5";
+const CACHE_NAME = "V2.7";
 const CACHE_ASSETS = [
   "./",
   "./game.js",
@@ -16,7 +16,7 @@ self.addEventListener("install", (e) => {
       return cache.addAll(CACHE_ASSETS);
     })
   );
-   self.skipWaiting();
+  self.skipWaiting();
 });
 
 // Aktifleştirme (Activate)
@@ -35,22 +35,41 @@ self.addEventListener("activate", (e) => {
   return self.clients.claim();
 });
 
-// Fetch
+// Fetch - CORRECTED
 self.addEventListener("fetch", (e) => {
+  // 1. If the request is NOT a GET request (e.g., POST, PUT, DELETE),
+  // simply fetch it from the network and do not cache it.
+  if (e.request.method !== "GET") {
+    e.respondWith(fetch(e.request));
+    return;
+  }
+
+  // 2. Also, ignore chrome-extension schemes or other non-http protocols if necessary
+  if (!e.request.url.startsWith('http')) {
+     return;
+  }
+
   e.respondWith(
     fetch(e.request)
       .then((response) => {
-        // başarılıysa cache’i güncelle
+        // Check if we received a valid response
+        if (!response || response.status !== 200 || response.type !== 'basic') {
+          return response;
+        }
+
+        // Clone the response
         const responseClone = response.clone();
+
         caches.open(CACHE_NAME).then((cache) => {
+          // Only cache GET requests (already filtered above, but good to be safe)
           cache.put(e.request, responseClone);
         });
+
         return response;
       })
       .catch(() => {
-        // offline ise cache'ten ver
+        // Offline: return cached version
         return caches.match(e.request);
       })
   );
 });
-
