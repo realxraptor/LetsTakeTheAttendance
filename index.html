@@ -243,6 +243,7 @@ body { transform: none; }
 /* Additional responsive tweaks for small screens */
 #leaderboardContainer { width: min(94vw, 360px); }
 @media (max-width: 420px) {
+    h1 { font-size: 24px; }
     body { margin-top: 12px; }
     #randomNumber { font-size: 32px; }
     #timeDisplay { font-size: 20px; }
@@ -274,7 +275,7 @@ body { transform: none; }
 
     • Each digit length is asked <b>5 times</b>, then the digit count increases, as well as increasing the max time limit.<br>
 
-    • Upon completing 8-digit numbers (every 180 points), digit length is reset to 1 and timer gets faster!. <br>
+    • Every 180 points, a new stage begins and the timer speeds up. <br>
 
     • Try to get the highest score possible! The game continues forever until you quit. <br>
     
@@ -324,6 +325,7 @@ body { transform: none; }
         <button id="tabSign" class="tabBtn">Sign Up</button>
         <button id="tabLogin" class="tabBtn">Log In</button>
         <button id="tabBoard" class="tabBtn active">Leaderboard</button>
+        <button id="tabShare" class="tabBtn">Share</button>
     </div>
 
     <div id="panelSign" class="tabPanel" style="display:none;">
@@ -358,6 +360,17 @@ body { transform: none; }
         <h1 style="margin:12px 0 6px 0;">Highest Score Leaderboard</h1>
         <div id="leaderboard" style="background:#fff; border-radius:8px; padding:10px; box-shadow:0 0 6px rgba(0,0,0,0.08); min-height:60px;"></div>
     </div>
+   <div id="panelShare" class="tabPanel" style="display:none;">
+    <div style="margin-bottom:8px;">Share the QR with friends!</div>
+    <img 
+        src="./images/pageQR.svg"
+        alt="Page QR Code"
+        max-width="100%"
+        height="auto"
+        style="border:1px solid #222; background:#fff;"
+    >
+   </div>
+
 </div>
 
 <style>
@@ -385,7 +398,7 @@ body { transform: none; }
 }
 </style>
 <div style="margin-top:20px; font-size:12px; color:#666; text-align:center; max-width:340px;">
-Version 2.7 <br>
+Version 2.8 <br>
 
 </body>
 
